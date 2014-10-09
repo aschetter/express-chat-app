@@ -1,18 +1,16 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
   .chat
     input(
       type='text'
       class='chat-name'
       placeholder='Enter your name'
     )
-  .chat-messages
-  textarea(
-    class='chat-textarea'
-    placeholder='Type your message'
-  ) 
-  .chat-status Status:
-    span Idle
+    .chat-messages
+    textarea(
+      class='chat-textarea'
+      placeholder='Type your message'
+    ) 
+    .chat-status Status:
+      span Idle
