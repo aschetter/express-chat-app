@@ -5,10 +5,30 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// routes
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+// create express app and server
 var app = express();
+var server = require('http').createServer(app);
+
+// express app listens on port 3000
+server.listen(app.get('port'), function(){
+  console.log('Express server listening on port ' + app.get('port'));
+});
+
+// socket.io setup
+var io = require('socket.io');
+var sio = io.listen(8080);
+
+// assign socket.io events
+sio.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -55,6 +75,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;
