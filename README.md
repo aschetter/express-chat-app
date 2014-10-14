@@ -1,3 +1,3 @@
-## basic chat app
+## express chat app
 
 Tech Stack: This application utilizes JavaScript, Node, Socket.io, Express, and MongoDB.
