@@ -1,5 +1,5 @@
 // Establish socket connection
-var socket = io.connect('http://10.10.10.10:8080');
+var socket = io.connect('http://localhost:8080');
 
 console.log('TEST');
 socket.on('news', function (data) {

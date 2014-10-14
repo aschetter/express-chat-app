@@ -1,3 +1,4 @@
+var MongoClient = require('mongodb').MongoClient;
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -16,6 +17,15 @@ var server = require('http').createServer(app);
 // express app listens on port 3000
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+});
+
+//Connect to MongoDB client
+MongoClient.connect('mongodb://127.0.0.1/chat', function(err, db) {
+    if (err) {
+        throw err;
+    }
+
+    console.log('connected to db');
 });
 
 // socket.io setup
