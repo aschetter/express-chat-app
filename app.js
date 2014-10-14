@@ -19,25 +19,70 @@ server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+// socket.io setup
+var io = require('socket.io');
+var sio = io.listen(8080);
+
 //Connect to MongoDB client
 MongoClient.connect('mongodb://127.0.0.1/chat', function(err, db) {
     if (err) {
         throw err;
     }
 
-    console.log('connected to db');
-});
+    // Connect to socket.io
+    sio.on('connection', function (socket) {
 
-// socket.io setup
-var io = require('socket.io');
-var sio = io.listen(8080);
+        // Use the 'messages' collection
+        var collection = db.collection('messages');
 
-// assign socket.io events
-sio.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+        // Send a message to the client confirming it connected to the server
+        socket.emit('connected', 'You are connected to the chat server!');
+        socket.on('confirmConnection', function (data) {
+            console.log(data);
+        });
+
+        // Send the messages stored in the DB when the user loads the page
+        collection.find().limit(100).sort({_id: 1}).toArray(function(err, res) {
+            if (err) {
+                throw err;
+            }
+            socket.emit('output', res);
+        });
+
+        // Define method to send the message status
+        function sendStatus (s) {
+            socket.emit('status', s);
+        };
+
+        // Process messages sent from the client
+        socket.on('toServer', function (data) {
+            console.log(data);
+
+            var name = data.name;
+            var message = data.message;
+
+            // Verify the content and name aren't empty
+            var whiteSpaceCheck = /^\s*$/;
+
+            if (whiteSpaceCheck.test(name) || whiteSpaceCheck.test(message)) {
+                sendStatus('Name and message is required.');
+            } else {
+
+                // If the content and name aren't empty, store the message in the DB
+                collection.insert({name: name, message: message}, function() {
+
+                    // Send most recent message to all clients
+                    sio.emit('output', [data]);
+
+                    // Send status to the client confirming the message was received
+                    sendStatus({
+                        message: "Message sent.",
+                        clear: true
+                    });
+                });
+            }
+        });
+    });
 });
 
 // view engine setup

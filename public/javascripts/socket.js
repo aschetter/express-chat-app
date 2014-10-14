@@ -1,12 +1,6 @@
 // Establish socket connection
 var socket = io.connect('http://localhost:8080');
 
-console.log('TEST');
-socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-});
-
 // Deliver message to the server confirming the connection
 socket.on('connected', function (data) {
     console.log(data);
